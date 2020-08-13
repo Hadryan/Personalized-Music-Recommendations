@@ -124,5 +124,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+## Personal gitignores
+# VScode settings
+.vscode
+
 # Credentials
 config.json
