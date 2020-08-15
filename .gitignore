@@ -128,5 +128,6 @@ dmypy.json
 # VScode settings
 .vscode
 
-# Credentials
+# Modular parameter text files
 config.json
+credentials.json
