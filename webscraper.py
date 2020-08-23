@@ -1,5 +1,7 @@
 # Standard library
 import json
+import time
+import random
 
 # Related third party
 from selenium import webdriver # Launch/initialise a browser and affect javascript easily
@@ -52,17 +54,31 @@ class WebScraper:
         # Click My Collections
         self.driver.find_element(By.CSS_SELECTOR, "a[data-qa='header_my_stations_link']").click()
 
+        self.scroll_to_bottom()
+
         station_elements = self.driver.find_elements(By.CLASS_NAME, 'InfiniteGrid__contents__itemContainer')
         
         stations = [self.driver.find_element(By.CLASS_NAME, "GridItem__caption__link").get_attribute('href') for element in station_elements]
-
+        
+        print(len(stations))
         # for element in station_elements:
         #     # stations += adds the letters instead of full string
         #     stations.append(self.driver.find_element(By.CLASS_NAME, "GridItem__caption__link").get_attribute('href'))
         
         return stations
-    def scroll_to_bottom(self):
         
+    def scroll_to_bottom(self, timeout=15):
+        SCROLL_PAUSE_TIME = random.uniform(0.5, 1.5)
+        
+        while True:
+            last_height = self.driver.execute_script("return document.body.scrollHeight")
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(SCROLL_PAUSE_TIME)
+            new_height = self.driver.execute_script("return document.body.scrollHeight")
+            if last_height == new_height:
+                break
+
+
     def go_to_URL(self, URL):
         self.driver.get(URL)
 
