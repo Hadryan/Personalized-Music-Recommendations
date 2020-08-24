@@ -24,7 +24,7 @@ class WebScraper:
         DRIVER_PATH = self.config['assets']['driver']
         self.driver = webdriver.Chrome(DRIVER_PATH, options=OPTIONS)
         
-        self.driver.implicitly_wait(10)
+        self.driver.implicitly_wait(20)
     
     def login(self, credentials_file="credentials.json"):
         # Load json credentials
@@ -56,24 +56,35 @@ class WebScraper:
 
         self.scroll_to_bottom()
 
-        station_elements = self.driver.find_elements(By.CLASS_NAME, 'InfiniteGrid__contents__itemContainer')
+        station_elements = self.driver.find_elements(By.CLASS_NAME, "GridItem__caption__link")
         
-        stations = [self.driver.find_element(By.CLASS_NAME, "GridItem__caption__link").get_attribute('href') for element in station_elements]
+        stations = [element.get_attribute('href') for element in station_elements]
         
-        print(len(stations))
         # for element in station_elements:
-        #     # stations += adds the letters instead of full string
+        #     # (stations +=) adds the letters instead of full string
         #     stations.append(self.driver.find_element(By.CLASS_NAME, "GridItem__caption__link").get_attribute('href'))
+        print(len(stations))
+        print(stations)
         
         return stations
         
+    def get_songs(self, stations):
+        thumbs_ups = []
+        thumbs_downs = []
+        
+        for station in stations:
+            self.go_to_URL(station)
+
     def scroll_to_bottom(self, timeout=15):
-        SCROLL_PAUSE_TIME = random.uniform(0.5, 1.5)
         
         while True:
+            SCROLL_PAUSE_TIME = random.uniform(0.75, 1.5)
             last_height = self.driver.execute_script("return document.body.scrollHeight")
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(SCROLL_PAUSE_TIME)
+            self.driver.execute_script("window.scroll(0, -30);")
+            time.sleep(SCROLL_PAUSE_TIME)
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             new_height = self.driver.execute_script("return document.body.scrollHeight")
             if last_height == new_height:
                 break
