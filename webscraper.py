@@ -33,8 +33,8 @@ class WebScraper:
 
         pandora_login_url = self.config['URLs']['pandora']['login']
         self.driver.get(pandora_login_url)
-        self.driver.find_element_by_name('username').send_keys(credentials['pandora']['username'])
-        self.driver.find_element_by_name('password').send_keys(credentials['pandora']['password'])
+        self.driver.find_element_by_name("username").send_keys(credentials['pandora']['username'])
+        self.driver.find_element_by_name("password").send_keys(credentials['pandora']['password'])
         self.driver.find_element_by_css_selector("button[data-qa='login_button']").click()
         
         # try:
@@ -50,7 +50,7 @@ class WebScraper:
     def close_browser(self):
         self.driver.quit()
     
-    def get_stations(self):
+    def get_stations_URL(self):
         # Click My Collections
         self.driver.find_element(By.CSS_SELECTOR, "a[data-qa='header_my_stations_link']").click()
 
@@ -58,25 +58,34 @@ class WebScraper:
 
         station_elements = self.driver.find_elements(By.CLASS_NAME, "GridItem__caption__link")
         
-        stations = [element.get_attribute('href') for element in station_elements]
+        stations_URL = [element.get_attribute("href") for element in station_elements]
         
         # for element in station_elements:
         #     # (stations +=) adds the letters instead of full string
         #     stations.append(self.driver.find_element(By.CLASS_NAME, "GridItem__caption__link").get_attribute('href'))
-        print(len(stations))
-        print(stations)
+        print(len(stations_URL))
+        print(stations_URL)
         
-        return stations
+        return stations_URL
         
-    def get_songs(self, stations):
+    def get_songs(self, stations_URL):
         thumbs_ups = []
         thumbs_downs = []
-        
-        for station in stations:
-            self.go_to_URL(station)
+        data = {'stations': []}
 
-    def scroll_to_bottom(self, timeout=15):
-        
+        for station_URL in stations_URL:
+            self.go_to_URL(station_URL)
+            name = self.driver.find_element(By.CLASS_NAME, "EditableTitle__input").get_attribute("value")
+            print(name)
+            break
+            # data['stations'].append({
+            #     'name':,
+            #     'URL': station_URL,
+            #     'thumbs_ups':,
+            #     'thumbs_downs':
+            # })
+
+    def scroll_to_bottom(self):
         while True:
             SCROLL_PAUSE_TIME = random.uniform(0.75, 1.5)
             last_height = self.driver.execute_script("return document.body.scrollHeight")
@@ -87,7 +96,7 @@ class WebScraper:
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             new_height = self.driver.execute_script("return document.body.scrollHeight")
             if last_height == new_height:
-                break
+                return
 
 
     def go_to_URL(self, URL):
