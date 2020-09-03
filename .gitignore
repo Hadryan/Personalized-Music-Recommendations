@@ -131,3 +131,6 @@ dmypy.json
 # Modular parameter text files
 config.json
 credentials.json
+
+# Random files
+notes.txt
