@@ -5,6 +5,7 @@ import random
 import sys
 
 # Related third party
+from bs4 import BeautifulSoup  # html/xml parser
 # Launch/initialise a browser and affect javascript easily
 from selenium import webdriver
 # Options for intialzing browser
@@ -208,3 +209,10 @@ class WebScraper:
 
     def go_to_URL(self, URL):
         self.driver.get(URL)
+
+    def build(self):
+        self.webscraper.login()
+        station_URLs = self.webscraper.get_stations_URLs()
+        self.webscraper.get_songs(station_URLs)
+        input('Press ENTER to exit browser')
+        self.webscraper.close_browser()
