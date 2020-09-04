@@ -1,0 +1,22 @@
+{
+  "stations": [
+    {
+      "name": "Gryffin Radio",
+      "URL": "https://www.pandora.com/station/123432424",
+      "songs": {
+        "name": ["Who Do You Love", "Dancing On My Own (Tiësto Remix)"],
+        "artist": ["The Chainsmokers & 5 Seconds Of Summer", "Calum Scott"],
+        "liked": [true, false]
+      }
+    },
+    {
+      "name": "test Radio",
+      "URL": "https://www.pandora.com/station/12564345",
+      "songs": {
+        "name": ["test song", "test song2", "test song"],
+        "artist": ["test artist", "test artist2", "test artist"],
+        "liked": [false, true, false]
+      }
+    }
+  ]
+}
