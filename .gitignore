@@ -132,5 +132,9 @@ dmypy.json
 config.json
 credentials.json
 
+# Data
+data.json
+errors.json
+
 # Random files
 notes.txt
