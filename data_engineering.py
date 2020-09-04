@@ -10,6 +10,7 @@ class PandoraSongSet:
                 self.data = json.load(f)
         except EnvironmentError as IO_error:
             print("Something is wrong with the file")
+
         self.songs = pd.DataFrame(columns=[
             'name', 'artist', 'liked'])
 
@@ -21,4 +22,12 @@ class PandoraSongSet:
             station_songs = list(zip(name, artist, liked))
 
             self.songs = self.songs.append(
-                pd.DataFrame(station['songs']))
+                pd.DataFrame(station['songs']), ignore_index=True)
+
+    def clean_dataframe(self):
+        self.songs = self.songs.drop_duplicates()
+        self.songs = self.songs.sort_values(['liked'])
+
+    def build(self):
+        self.create_master_dataframe()
+        self.clean_dataframe()
