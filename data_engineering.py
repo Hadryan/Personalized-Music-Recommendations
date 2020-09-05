@@ -26,7 +26,11 @@ class PandoraSongSet:
 
     def clean_dataframe(self):
         self.songs = self.songs.drop_duplicates()
-        self.songs = self.songs.sort_values(['liked'])
+        self.songs = self.songs.sort_values(
+            ['liked'], ascending=False)
+
+    def append_audio_features(self):
+        pass
 
     def build(self):
         self.create_master_dataframe()
