@@ -36,3 +36,11 @@ class SpotifyAPI:
         except Exception as e:
             print(e)
             return "NaN"
+
+    def get_audio_features(self, tracks):
+        n = 100
+        track_features = []
+        tracks = [tracks[i:i+n] for i in range(0, len(tracks), n)]
+        for track_group in tracks:
+            track_features.append(self.sp.audio_features(track_group))
+        return track_features
