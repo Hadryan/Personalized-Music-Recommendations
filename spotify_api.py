@@ -53,7 +53,3 @@ class SpotifyAPI:
         for track_group in tracks:
             track_features += self.sp.audio_features(track_group)
         return track_features
-
-
-# s = SpotifyAPI()
-# print(s.get_audio_features(["NaN", "3h5IIiL9vK5aR0DZO6jD7D"]))
