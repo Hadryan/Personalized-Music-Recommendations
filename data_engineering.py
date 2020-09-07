@@ -41,7 +41,8 @@ class PandoraSongSet:
         try:
             self.songs.to_csv(r"output\unclean_songs.csv")
         except Exception as e:
-            print(f"Something is wrong with the songs dataframe file")
+            print(
+                f"Something is wrong with the creation of the full songs dataframe file.")
             print(e)
 
     def clean_names(self, names):
@@ -70,7 +71,8 @@ class PandoraSongSet:
         try:
             self.songs.to_csv(r"output\songs.csv")
         except Exception as e:
-            print(f"Something is wrong with the songs dataframe file")
+            print(
+                "Something is wrong with the creation of the cleaned songs dataframe file.")
             print(e)
 
     def build(self):
