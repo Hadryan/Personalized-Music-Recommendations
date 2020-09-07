@@ -3,6 +3,7 @@ import json
 import time
 import random
 import sys
+import pathlib
 
 # Related third party
 from bs4 import BeautifulSoup  # html/xml parser
@@ -38,6 +39,7 @@ class WebScraper:
         self.driver = webdriver.Chrome(DRIVER_PATH, options=OPTIONS)
 
         self.driver.implicitly_wait(10)
+        self.DATA_PATH = r"inputs\data.json"
 
     def login(self, credentials_file=r"authentication\credentials.json"):
         try:
@@ -45,7 +47,7 @@ class WebScraper:
                 credentials = json.load(f)
 
             pandora_login_url = r"https://www.pandora.com/account/sign-in"
-            self.driver.get(pandora_login_url)
+            self.driver.go_to_url(pandora_login_url)
             self.driver.find_element(By.NAME, "username").send_keys(
                 credentials['pandora']['username'])
             self.driver.find_element(By.NAME, "password").send_keys(
@@ -53,19 +55,21 @@ class WebScraper:
             self.driver.find_element(By.CSS_SELECTOR,
                                      "button[data-qa='login_button']").click()
 
-            self.stations_urls = self.get_stations_urls()
+            self.station_urls = self.get_station_urls()
             print("Pandora login successful.")
+            print(f"There are {len(self.station_urls)} stations.")
+
         except Exception as e:
             print(e)
 
     def logout(self):
         pandora_logout_url = r"https://www.pandora.com/account/sign-out"
-        self.driver.get(pandora_logout_url)
+        self.driver.go_to_url(pandora_logout_url)
 
     def close_browser(self):
         self.driver.quit()
 
-    def get_stations_urls(self):
+    def get_station_urls(self):
         self.driver.find_element(
             By.CSS_SELECTOR, "a[data-qa='header_my_stations_link']").click()
 
@@ -73,18 +77,18 @@ class WebScraper:
 
         station_elements = self.driver.find_elements(
             By.CLASS_NAME, "GridItem__caption__link")
-        stations_URL = [element.get_attribute(
+        station_urls = [element.get_attribute(
             "href") for element in station_elements]
 
-        return stations_URL
+        return station_urls
 
-    def get_songs(self, stations_URL):
+    def get_songs(self, stations_url):
         data = {'stations': []}
         errors = []
 
-        for station_URL in stations_URL:
+        for station_url in stations_url:
             try:
-                self.go_to_URL(station_URL)
+                self.go_to_url(station_url)
                 VIEW_PAUSE_TIME = random.uniform(1, 2)
                 time.sleep(VIEW_PAUSE_TIME)
 
@@ -110,6 +114,9 @@ class WebScraper:
                     feedback_list = self.driver.find_element(
                         By.CLASS_NAME, "FeedbackList__list")
                     self.scroll_element(feedback_list)
+
+                    feedback_list = self.driver.find_element(
+                        By.CLASS_NAME, "FeedbackList__list")
                     up_songs, up_artists = self.collect_feedback_list(
                         feedback_list)
 
@@ -123,13 +130,16 @@ class WebScraper:
                         By.CLASS_NAME, "FeedbackList__list")
 
                     self.scroll_element(feedback_list)
+                    feedback_list = self.driver.find_element(
+                        By.CLASS_NAME, "FeedbackList__list")
+
                     down_songs, down_artists = self.collect_feedback_list(
                         feedback_list)
                 print(
                     f"\tActual Likes: {len(up_songs)} Actual Dislike: {len(down_songs)}")
                 data['stations'].append({
                     'name': name,
-                    'URL': station_URL,
+                    'url': station_url,
                     'songs': {'name': up_songs + down_songs, 'artist': up_artists + down_artists, 'liked': ([True]*len(up_songs)) + [False]*len(down_songs)}
                 })
             except KeyboardInterrupt:
@@ -137,16 +147,30 @@ class WebScraper:
                 break
             except:
                 exception = str(sys.exc_info())
-                errors.append({station_URL: exception})
+                errors.append({station_url: exception})
                 continue
         try:
-            with open(r'inputs\data.json', 'w', encoding='utf-8') as f1, open(r'outputs\errors.json', 'w', encoding='utf-8') as f2:
+            with open(self.DATA_PATH, 'w', encoding='utf-8') as f1, open(r'outputs\errors.json', 'w', encoding='utf-8') as f2:
                 json.dump(data, f1, ensure_ascii=False, indent=1)
                 json.dump(errors, f2, ensure_ascii=False, indent=1)
+            print("The data JSON has been created.")
         except EnvironmentError as e:
             print("Something is wrong with the creation of the data and errors file.")
             print(e)
 
+    def collect_feedback_list(self, feedback_list):
+        feedback_html = feedback_list.get_attribute("outerHTML")
+        soup = BeautifulSoup(feedback_html, "html.parser")
+
+        songs = soup.find_all("div", attrs={
+            "class": "RowItemCenterColumn__mainText"})
+        artists = soup.find_all("div", attrs={
+            "class": "RowItemCenterColumn__secondText"})
+
+        songs = [song.text for song in songs]
+        artists = [artist.text for artist in artists]
+
+        return songs, artists
     # def collect_feedback_list(self, feedback_list):
     #     time.sleep(random.uniform(0.75, 1.5))
 
@@ -199,18 +223,16 @@ class WebScraper:
             if last_height == new_height:
                 return
 
-    def go_to_URL(self, URL):
-        self.driver.get(URL)
+    def go_to_url(self, url):
+        self.driver.get(url)
+        time.sleep(random.uniform(3, 7.5))
 
     def build(self):
-        self.webscraper.login()
-        station_urls = self.webscraper.get_stations_urls()
-        self.webscraper.get_songs(station_urls)
-        input('Press ENTER to exit browser')
-        self.webscraper.close_browser()
-
-
-w = WebScraper(is_headless=False)
-w.login()
-w.get_songs(["https://www.pandora.com/station/4550091192589184342",
-             "https://www.pandora.com/station/4563457525951327574"])
+        data_file = pathlib.Path(self.DATA_PATH)
+        if not data_file.exists() or input("The data JSON already exists. Do you want to overwrite it? Type Y or press ENTER for no.\n") == 'Y':
+            self.login()
+            self.get_songs(self.station_urls)
+            input('Press ENTER to exit browser')
+            self.close_browser()
+        else:
+            print("Did not replace JSON.")
