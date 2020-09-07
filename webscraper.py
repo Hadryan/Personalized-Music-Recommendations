@@ -37,7 +37,7 @@ class WebScraper:
         with open(config_file, 'r') as f:
             self.config = json.load(f)
 
-        DRIVER_PATH = self.config['assets']['driver']
+        DRIVER_PATH = "assets\\chromedriver.exe"
         self.driver = webdriver.Chrome(DRIVER_PATH, options=OPTIONS)
 
         self.driver.implicitly_wait(10)
@@ -46,7 +46,7 @@ class WebScraper:
         with open(credentials_file, 'r') as f:
             credentials = json.load(f)
 
-        pandora_login_url = self.config['URLs']['pandora']['login']
+        pandora_login_url = "https://www.pandora.com/account/sign-in"
         self.driver.get(pandora_login_url)
         self.driver.find_element_by_name("username").send_keys(
             credentials['pandora']['username'])
@@ -56,7 +56,7 @@ class WebScraper:
             "button[data-qa='login_button']").click()
 
     def logout(self):
-        pandora_logout_url = self.config['URLs']['pandora']['logout']
+        pandora_logout_url = "https://www.pandora.com/account/sign-out"
         self.driver.get(pandora_logout_url)
 
     def close_browser(self):
