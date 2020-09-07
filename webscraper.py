@@ -40,26 +40,32 @@ class WebScraper:
         self.driver.implicitly_wait(10)
 
     def login(self, credentials_file=r"authentication\credentials.json"):
-        with open(credentials_file, 'r') as f:
-            credentials = json.load(f)
+        try:
+            with open(credentials_file, 'r') as f:
+                credentials = json.load(f)
 
-        pandora_login_url = "https://www.pandora.com/account/sign-in"
-        self.driver.get(pandora_login_url)
-        self.driver.find_element_by_name("username").send_keys(
-            credentials['pandora']['username'])
-        self.driver.find_element_by_name("password").send_keys(
-            credentials['pandora']['password'])
-        self.driver.find_element_by_css_selector(
-            "button[data-qa='login_button']").click()
+            pandora_login_url = r"https://www.pandora.com/account/sign-in"
+            self.driver.get(pandora_login_url)
+            self.driver.find_element(By.NAME, "username").send_keys(
+                credentials['pandora']['username'])
+            self.driver.find_element(By.NAME, "password").send_keys(
+                credentials['pandora']['password'])
+            self.driver.find_element(By.CSS_SELECTOR,
+                                     "button[data-qa='login_button']").click()
+
+            self.stations_urls = self.get_stations_urls()
+            print("Pandora login successful.")
+        except Exception as e:
+            print(e)
 
     def logout(self):
-        pandora_logout_url = "https://www.pandora.com/account/sign-out"
+        pandora_logout_url = r"https://www.pandora.com/account/sign-out"
         self.driver.get(pandora_logout_url)
 
     def close_browser(self):
         self.driver.quit()
 
-    def get_stations_URLs(self):
+    def get_stations_urls(self):
         self.driver.find_element(
             By.CSS_SELECTOR, "a[data-qa='header_my_stations_link']").click()
 
@@ -133,22 +139,25 @@ class WebScraper:
                 exception = str(sys.exc_info())
                 errors.append({station_URL: exception})
                 continue
+        try:
+            with open(r'inputs\data.json', 'w', encoding='utf-8') as f1, open(r'outputs\errors.json', 'w', encoding='utf-8') as f2:
+                json.dump(data, f1, ensure_ascii=False, indent=1)
+                json.dump(errors, f2, ensure_ascii=False, indent=1)
+        except EnvironmentError as e:
+            print("Something is wrong with the creation of the data and errors file.")
+            print(e)
 
-        with open(r'inputs\data.json', 'w', encoding='utf-8') as f1, open(r'outputs\errors.json', 'w', encoding='utf-8') as f2:
-            json.dump(data, f1, ensure_ascii=False, indent=1)
-            json.dump(errors, f2, ensure_ascii=False, indent=1)
+    # def collect_feedback_list(self, feedback_list):
+    #     time.sleep(random.uniform(0.75, 1.5))
 
-    def collect_feedback_list(self, feedback_list):
-        time.sleep(random.uniform(0.75, 1.5))
+    #     songs = feedback_list.find_elements(
+    #         By.CLASS_NAME, "RowItemCenterColumn__mainText")
+    #     artists = feedback_list.find_elements(
+    #         By.CLASS_NAME, "RowItemCenterColumn__secondText")
 
-        songs = feedback_list.find_elements(
-            By.CLASS_NAME, "RowItemCenterColumn__mainText")
-        artists = feedback_list.find_elements(
-            By.CLASS_NAME, "RowItemCenterColumn__secondText")
-
-        songs = [element.text for element in songs]
-        artists = [element.text for element in artists]
-        return songs, artists
+    #     songs = [element.text for element in songs]
+    #     artists = [element.text for element in artists]
+    #     return songs, artists
 
     def scroll_element_into_middle(self, element):
         time.sleep(random.uniform(0.75, 1.5))
@@ -195,7 +204,13 @@ class WebScraper:
 
     def build(self):
         self.webscraper.login()
-        station_URLs = self.webscraper.get_stations_URLs()
-        self.webscraper.get_songs(station_URLs)
+        station_urls = self.webscraper.get_stations_urls()
+        self.webscraper.get_songs(station_urls)
         input('Press ENTER to exit browser')
         self.webscraper.close_browser()
+
+
+w = WebScraper(is_headless=False)
+w.login()
+w.get_songs(["https://www.pandora.com/station/4550091192589184342",
+             "https://www.pandora.com/station/4563457525951327574"])
