@@ -1,5 +1,5 @@
 import json
-import pandas as pd  # dataframe
+import pandas as pd
 import re
 from spotify_api import SpotifyAPI
 
@@ -54,7 +54,7 @@ class PandoraSongSet:
         for track_name, track_artist in zip(track_names, track_artists):
             track_id = spotify.get_track_id(track_name, track_artist)
             track_ids.append(track_id)
-            print(f"Appended {track_name} with {track_id}")
+            # print(f"Appended {track_name} with {track_id}")
         return spotify.get_audio_features(track_ids)
 
     def clean_dataframe(self):
