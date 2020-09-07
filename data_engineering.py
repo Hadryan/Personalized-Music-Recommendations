@@ -24,11 +24,19 @@ class PandoraSongSet:
         names = self.clean_names(names)
         artists = self.clean_artists(artists)
 
-        audio_features = self.create_audio_features(names, artists)
-        with open('temp.json', 'w', encoding='utf-8') as f1:
-            json.dump(audio_features, f1, ensure_ascii=False, indent=1)
+        station_songs = list(
+            zip(names, artists, likeds))
+        station_songs_df = pd.DataFrame(
+            station_songs, columns=['name', 'artist', 'liked'])
 
-        station_songs = list(zip(names, artists, likeds))
+        audio_features = self.create_audio_features(names, artists)
+        default_values = {'danceability': None, 'energy': None, 'key': None, 'loudness': None, 'mode': None, 'speechiness': None, 'acousticness': None, 'instrumentalness': None,
+                          'liveness': None, 'valence': None, 'tempo': None, 'type': None, 'id': None, 'uri': None, 'track_href': None, 'analysis_url': None, 'duration_ms': None, 'time_signature': None}
+        audio_features = [default_values if features ==
+                          None else features for features in audio_features]
+
+        audio_features_df = pd.DataFrame(audio_features)
+        self.songs = pd.concat([station_songs_df, audio_features_df], axis=1)
 
     def clean_names(self, names):
         pattern = "(?i)(\s\(feat.*)"
