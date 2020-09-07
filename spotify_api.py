@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -19,7 +20,7 @@ class SpotifyAPI:
                 client_id, client_secret)
             self.sp = spotipy.Spotify(
                 client_credentials_manager=client_credentials_manager)
-            print("Spotify authentication successful")
+            print("Spotify authentication successful!")
         except EnvironmentError as io_error:
             print(io_error)
 
@@ -30,16 +31,19 @@ class SpotifyAPI:
 
     def get_track_id(self, track, artist):
         query = track + " " + artist
-        while True:
+        while query != '':
             try:
                 track_json = self.sp.search(query, limit=1)
                 track_id = track_json['tracks']['items'][0]['id']
                 return track_id
             except Exception as e:
+                pd.DataFrame([query]).to_clipboard(
+                    excel=False, index=False, header=False)
                 query = input(
-                    f"The query: [{query}] did not work. Type a new one! Or press ENTER to fill with NaN\n")
+                    f"The query: [{query}] did not work. Type a new one or press ENTER to fill with NaN.\n")
                 if query == '':
-                    return "NaN"
+                    query = input(f"Are you sure? Press ENTER again.\n")
+        return "NaN"
 
     def get_audio_features(self, tracks):
         n = 100
