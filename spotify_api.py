@@ -37,6 +37,7 @@ class SpotifyAPI:
                 track_id = track_json['tracks']['items'][0]['id']
                 return track_id
             except Exception as e:
+                return "NaN"
                 pd.DataFrame([query]).to_clipboard(
                     excel=False, index=False, header=False)
                 query = input(
@@ -52,3 +53,7 @@ class SpotifyAPI:
         for track_group in tracks:
             track_features += self.sp.audio_features(track_group)
         return track_features
+
+
+# s = SpotifyAPI()
+# print(s.get_audio_features(["NaN", "3h5IIiL9vK5aR0DZO6jD7D"]))
