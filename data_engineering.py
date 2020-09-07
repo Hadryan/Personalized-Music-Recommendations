@@ -5,12 +5,12 @@ from spotify_api import SpotifyAPI
 
 
 class PandoraSongSet:
-    def __init__(self, data_file="data.json"):
+    def __init__(self, data_file=r"inputs\data.json"):
         try:
             with open(data_file, 'r', encoding="utf8") as f:
                 self.data = json.load(f)
         except EnvironmentError as IO_error:
-            print("Something is wrong with the file")
+            print("Something is wrong with the data file.")
 
         self.songs = pd.DataFrame()
 
@@ -34,9 +34,15 @@ class PandoraSongSet:
                           'liveness': None, 'valence': None, 'tempo': None, 'type': None, 'id': None, 'uri': None, 'track_href': None, 'analysis_url': None, 'duration_ms': None, 'time_signature': None}
         audio_features = [default_values if features ==
                           None else features for features in audio_features]
-
         audio_features_df = pd.DataFrame(audio_features)
+
         self.songs = pd.concat([station_songs_df, audio_features_df], axis=1)
+
+        try:
+            self.songs.to_csv(r"output\unclean_songs.csv")
+        except Exception as e:
+            print(f"Something is wrong with the songs dataframe file")
+            print(e)
 
     def clean_names(self, names):
         pattern = "(?i)(\s\(feat.*)"
@@ -45,8 +51,8 @@ class PandoraSongSet:
 
     def clean_artists(self, artists):
         pattern = "(?i)\s+\&\s+"
-        clean_names = [re.sub(pattern, ' ', artist) for artist in artists]
-        return clean_names
+        clean_artists = [re.sub(pattern, ' ', artist) for artist in artists]
+        return clean_artists
 
     def create_audio_features(self, track_names, track_artists):
         spotify = SpotifyAPI()
@@ -61,6 +67,11 @@ class PandoraSongSet:
         self.songs = self.songs.drop_duplicates().dropna()
         self.songs = self.songs.sort_values(
             ['liked'], ascending=False)
+        try:
+            self.songs.to_csv(r"output\songs.csv")
+        except Exception as e:
+            print(f"Something is wrong with the songs dataframe file")
+            print(e)
 
     def build(self):
         self.create_master_dataframe()
