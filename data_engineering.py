@@ -46,12 +46,12 @@ class PandoraSongSet:
             print(e)
 
     def clean_names(self, names):
-        pattern = "(?i)(\s\(feat.*)"
+        pattern = "(?i)(\s*)(?:.*)(\s\(feat.*)"
         clean_names = [re.sub(pattern, '', name) for name in names]
         return clean_names
 
     def clean_artists(self, artists):
-        pattern = "(?i)\s+\&\s+"
+        pattern = "(?i)(\s*)(?:.*)(\s+\&\s+)"
         clean_artists = [re.sub(pattern, ' ', artist) for artist in artists]
         return clean_artists
 
