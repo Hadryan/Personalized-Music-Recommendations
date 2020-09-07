@@ -24,11 +24,6 @@ class SpotifyAPI:
         except EnvironmentError as io_error:
             print(io_error)
 
-    def track_exists(self, track):
-        track_json = self.sp.search(track, limit=1)
-        test = track_json['tracks']['total']
-        return True if test > 0 else False
-
     def get_track_id(self, track, artist):
         query = track + " " + artist
         while query != '':
@@ -37,6 +32,7 @@ class SpotifyAPI:
                 track_id = track_json['tracks']['items'][0]['id']
                 return track_id
             except Exception as e:
+                # print(f"Track [{track}] was not found.")
                 return "NaN"
                 pd.DataFrame([query]).to_clipboard(
                     excel=False, index=False, header=False)
@@ -52,4 +48,5 @@ class SpotifyAPI:
         tracks = [tracks[i:i+n] for i in range(0, len(tracks), n)]
         for track_group in tracks:
             track_features += self.sp.audio_features(track_group)
+        print("Audio features retrieved.")
         return track_features
