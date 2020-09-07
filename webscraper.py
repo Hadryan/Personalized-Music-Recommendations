@@ -21,7 +21,7 @@ from selenium.common.exceptions import TimeoutException
 
 
 class WebScraper:
-    def __init__(self, is_headless=True, config_file="config.json"):
+    def __init__(self, is_headless=True):
         OPTIONS = Options()
         OPTIONS.headless = is_headless
         OPTIONS.add_argument("--mute-audio")
@@ -42,7 +42,7 @@ class WebScraper:
 
         self.driver.implicitly_wait(10)
 
-    def login(self, credentials_file="credentials.json"):
+    def login(self, credentials_file=r"authentication\credentials.json"):
         with open(credentials_file, 'r') as f:
             credentials = json.load(f)
 
@@ -137,7 +137,7 @@ class WebScraper:
                 errors.append({station_URL: exception})
                 continue
 
-        with open('data.json', 'w', encoding='utf-8') as f1, open('errors.json', 'w', encoding='utf-8') as f2:
+        with open(r'inputs\data.json', 'w', encoding='utf-8') as f1, open(r'outputs\errors.json', 'w', encoding='utf-8') as f2:
             json.dump(data, f1, ensure_ascii=False, indent=1)
             json.dump(errors, f2, ensure_ascii=False, indent=1)
 
