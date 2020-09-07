@@ -34,9 +34,6 @@ class WebScraper:
         else:
             OPTIONS.add_argument("--start-maximized")
 
-        with open(config_file, 'r') as f:
-            self.config = json.load(f)
-
         DRIVER_PATH = "assets\\chromedriver.exe"
         self.driver = webdriver.Chrome(DRIVER_PATH, options=OPTIONS)
 
