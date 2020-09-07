@@ -36,23 +36,34 @@ class PandoraSongSet:
                           None else features for features in audio_features]
         audio_features_df = pd.DataFrame(audio_features)
 
-        self.songs = pd.concat([station_songs_df, audio_features_df], axis=1)
+        self.unclean_songs = pd.concat(
+            [station_songs_df, audio_features_df], axis=1)
 
         try:
-            self.songs.to_csv(r"output\unclean_songs.csv")
+            self.unclean_songs.to_csv(r"outputs\unclean_songs.csv")
+            print("The full songs CSV has been made.")
         except Exception as e:
             print(
                 f"Something is wrong with the creation of the full songs dataframe file.")
             print(e)
 
     def clean_names(self, names):
-        pattern = "(?i)(\s*)(?:.*)(\s\(feat.*)"
-        clean_names = [re.sub(pattern, '', name) for name in names]
+        pattern1 = "^(\s)"
+        pattern2 = "(?i)(\s\(feat.*)"
+        pattern3 = "(?i)(\sEdit.*)"
+
+        clean_names = [re.sub(pattern1, '', name) for name in names]
+        clean_names = [re.sub(pattern2, '', name) for name in clean_names]
+        clean_names = [re.sub(pattern3, '', name) for name in clean_names]
+
         return clean_names
 
     def clean_artists(self, artists):
-        pattern = "(?i)(\s*)(?:.*)(\s+\&\s+)"
-        clean_artists = [re.sub(pattern, ' ', artist) for artist in artists]
+        pattern1 = "^(\s)"
+        pattern2 = "(?i)(\s+\&\s+)"
+        clean_artists = [re.sub(pattern1, '', artist) for artist in artists]
+        clean_artists = [re.sub(pattern2, ' ', artist)
+                         for artist in clean_artists]
         return clean_artists
 
     def create_audio_features(self, track_names, track_artists):
@@ -65,11 +76,12 @@ class PandoraSongSet:
         return spotify.get_audio_features(track_ids)
 
     def clean_dataframe(self):
-        self.songs = self.songs.drop_duplicates().dropna()
+        self.songs = self.unclean_songs.drop_duplicates().dropna()
         self.songs = self.songs.sort_values(
             ['liked'], ascending=False)
         try:
-            self.songs.to_csv(r"output\songs.csv")
+            self.songs.to_csv(r"outputs\songs.csv")
+            print("The cleaned songs CSV has been made.")
         except Exception as e:
             print(
                 "Something is wrong with the creation of the cleaned songs dataframe file.")
