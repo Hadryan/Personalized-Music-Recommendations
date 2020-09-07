@@ -43,7 +43,6 @@ class WebScraper:
         self.driver.implicitly_wait(10)
 
     def login(self, credentials_file="credentials.json"):
-        # Load json credentials
         with open(credentials_file, 'r') as f:
             credentials = json.load(f)
 
@@ -56,12 +55,6 @@ class WebScraper:
         self.driver.find_element_by_css_selector(
             "button[data-qa='login_button']").click()
 
-        # try:
-        # Using implciit wait and explicit wait together causes errors
-        #     WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "nowPlayingTopInfo__artContainer__art")))
-        # except:
-        #     self.close_browser()
-
     def logout(self):
         pandora_logout_url = self.config['URLs']['pandora']['logout']
         self.driver.get(pandora_logout_url)
@@ -70,7 +63,6 @@ class WebScraper:
         self.driver.quit()
 
     def get_stations_URLs(self):
-        # Click My Collections
         self.driver.find_element(
             By.CSS_SELECTOR, "a[data-qa='header_my_stations_link']").click()
 
@@ -80,12 +72,6 @@ class WebScraper:
             By.CLASS_NAME, "GridItem__caption__link")
         stations_URL = [element.get_attribute(
             "href") for element in station_elements]
-
-        # for element in station_elements:
-        #     # (stations +=) adds the letters instead of full string
-        #     stations.append(self.driver.find_element(By.CLASS_NAME, "GridItem__caption__link").get_attribute('href'))
-        print(len(stations_URL))
-        print(stations_URL)
 
         return stations_URL
 
