@@ -16,7 +16,7 @@ pip install spotipy
 ## Usage
 
 ```python
-The [main notebook](main.ipynb) should lay out how you can use this program.
+The [main notebook](https://github.com/vphan404/Personalized-Music-Recommendations/blob/master/main.ipynb) should lay out how you can use this program.
 ```
 
 ## License
