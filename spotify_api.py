@@ -9,7 +9,7 @@ class SpotifyAPI:
     def __init__(self):
         self.__authenticate()
 
-    def __authenticate(self, credentials_file="credentials.json"):
+    def __authenticate(self, credentials_file=r"authentication\credentials.json"):
         try:
             with open(credentials_file, 'r', encoding="utf8") as f:
                 credentials = json.load(f)
