@@ -128,13 +128,13 @@ dmypy.json
 # VScode settings
 .vscode
 
-# Modular parameter text files
-config.json
+# Authenticaion information
+authentication/
 credentials.json
 
 # Data
-data.json
-errors.json
+inputs/
+outputs/
 
 # Random files
 notes.txt
