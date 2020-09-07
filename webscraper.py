@@ -47,7 +47,7 @@ class WebScraper:
                 credentials = json.load(f)
 
             pandora_login_url = r"https://www.pandora.com/account/sign-in"
-            self.driver.go_to_url(pandora_login_url)
+            self.go_to_url(pandora_login_url)
             self.driver.find_element(By.NAME, "username").send_keys(
                 credentials['pandora']['username'])
             self.driver.find_element(By.NAME, "password").send_keys(
@@ -64,7 +64,7 @@ class WebScraper:
 
     def logout(self):
         pandora_logout_url = r"https://www.pandora.com/account/sign-out"
-        self.driver.go_to_url(pandora_logout_url)
+        self.go_to_url(pandora_logout_url)
 
     def close_browser(self):
         self.driver.quit()
@@ -232,7 +232,7 @@ class WebScraper:
         if not data_file.exists() or input("The data JSON already exists. Do you want to overwrite it? Type Y or press ENTER for no.\n") == 'Y':
             self.login()
             self.get_songs(self.station_urls)
-            input('Press ENTER to exit browser')
+            input('Press ENTER to exit browser.')
             self.close_browser()
         else:
             print("Did not replace JSON.")
