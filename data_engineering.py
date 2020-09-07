@@ -1,6 +1,7 @@
 import json
 import pandas as pd  # dataframe
-import requests  # for making HTTP requests
+import re
+from spotify_api import SpotifyAPI
 
 
 class PandoraSongSet:
@@ -11,26 +12,47 @@ class PandoraSongSet:
         except EnvironmentError as IO_error:
             print("Something is wrong with the file")
 
-        self.songs = pd.DataFrame(columns=[
-            'name', 'artist', 'liked'])
+        self.songs = pd.DataFrame()
 
     def create_master_dataframe(self):
+        names, artists, likeds = ([] for i in range(3))
         for station in self.data['stations']:
-            name = station['songs']['name']
-            artist = station['songs']['artist']
-            liked = station['songs']['liked']
-            station_songs = list(zip(name, artist, liked))
+            names += station['songs']['name']
+            artists += station['songs']['artist']
+            likeds += station['songs']['liked']
 
-            self.songs = self.songs.append(
-                pd.DataFrame(station['songs']), ignore_index=True)
+        names = self.clean_names(names)
+        artists = self.clean_artists(artists)
+
+        audio_features = self.create_audio_features(names, artists)
+        with open('temp.json', 'w', encoding='utf-8') as f1:
+            json.dump(audio_features, f1, ensure_ascii=False, indent=1)
+
+        station_songs = list(zip(names, artists, likeds))
+
+    def clean_names(self, names):
+        pattern = "(?i)(\s\(feat.*)"
+        clean_names = [re.sub(pattern, '', name) for name in names]
+        return clean_names
+
+    def clean_artists(self, artists):
+        pattern = "(?i)\s+\&\s+"
+        clean_names = [re.sub(pattern, ' ', artist) for artist in artists]
+        return clean_names
+
+    def create_audio_features(self, track_names, track_artists):
+        spotify = SpotifyAPI()
+        track_ids = []
+        for track_name, track_artist in zip(track_names, track_artists):
+            track_id = spotify.get_track_id(track_name, track_artist)
+            track_ids.append(track_id)
+            print(f"Appended {track_name} with {track_id}")
+        return spotify.get_audio_features(track_ids)
 
     def clean_dataframe(self):
-        self.songs = self.songs.drop_duplicates()
+        self.songs = self.songs.drop_duplicates().dropna()
         self.songs = self.songs.sort_values(
             ['liked'], ascending=False)
-
-    def append_audio_features(self):
-        pass
 
     def build(self):
         self.create_master_dataframe()
