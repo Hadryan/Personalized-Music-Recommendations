@@ -77,8 +77,19 @@ class PandoraSongSet:
 
     def clean_dataframe(self):
         self.songs = self.unclean_songs.drop_duplicates().dropna()
+        self.songs = self.songs.drop(axis=1,
+                                     columns=["type", "id", "uri", "track_href", "analysis_url"])
+
         self.songs = self.songs.sort_values(
             ['liked'], ascending=False)
+        self.songs.liked = self.songs.liked.eq(True).mul(1)
+
+        temp = self.songs.pop('liked')
+        self.songs['liked'] = temp
+
+        self.songs = self.songs.astype(
+            {'key': 'int64', 'mode': 'int64', 'duration_ms': 'int64', 'time_signature': 'int64', 'liked': 'int64'})
+
         try:
             self.songs.to_csv(r"outputs\songs.csv")
             print("The cleaned songs CSV has been made.")
