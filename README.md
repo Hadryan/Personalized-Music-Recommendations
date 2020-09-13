@@ -4,7 +4,7 @@ A music program where I combined labeled data from Pandora with Spotify audio fe
 
 ## Motivation
 
-This is a personal project to expand my data wrangling, machine learning, and general Python skills. I merged two of my most significant interests to do a project that excited me and kept me wanting to learn. I think AI is the future, and creating a specialized tool for music was very fulfilling.\
+This is a personal project to expand my data wrangling, machine learning, and general Python skills. I merged two of my most significant interests to do a project that excited me and kept me wanting to learn. I think AI is the future, and creating a specialized tool for music was very fulfilling.
 
 I used Pandora's data because it was my primary music player for years, which means it has many of my liked and unliked songs. They do not have a personal developer API, so I had to use Spotify's API for song features. Spotify does have a recommendation endpoint but would require the user to have Spotify music data in the form of liked songs or playlists.
 
