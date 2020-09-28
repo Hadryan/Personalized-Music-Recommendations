@@ -24,6 +24,7 @@ pip install selenium
 pip install spotipy
 # Creating deep learning models.
 pip install tensorflow
+pip install tensorflow-addons
 ```
 
 These should come with Anaconda.
